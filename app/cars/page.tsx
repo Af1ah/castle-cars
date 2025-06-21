@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { CarCard } from "@/components/ui/car-card"
-import { CarFilters } from "@/components/car/car-filters"
-import { SectionTitle } from "@/components/ui/section-title"
+import { useState } from "react";
+import { CarCard } from "@/components/ui/car-card";
+import { CarFilters } from "@/components/car/car-filters";
+import { SectionTitle } from "@/components/ui/section-title";
 
 // Mock data for cars with some having optional details
 const allCars = [
@@ -12,7 +12,8 @@ const allCars = [
     title: "BMW F30 320d Luxury Line",
     year: 2014,
     price: 1850000,
-    image: "/placeholder.svg?height=300&width=400",
+    image: "images/bm/bm1.jpg",
+
     mileage: 146000,
     transmission: "Automatic",
     make: "BMW",
@@ -68,39 +69,41 @@ const allCars = [
     transmission: "Automatic",
     make: "Toyota",
   },
-]
+];
 
 interface FilterState {
-  make: string
-  priceRange: string
-  year: string
+  make: string;
+  priceRange: string;
+  year: string;
 }
 
 export default function CarsPage() {
-  const [filteredCars, setFilteredCars] = useState(allCars)
+  const [filteredCars, setFilteredCars] = useState(allCars);
 
   const handleFilterChange = (filters: FilterState) => {
-    let filtered = allCars
+    let filtered = allCars;
 
     if (filters.make) {
-      filtered = filtered.filter((car) => car.make === filters.make)
+      filtered = filtered.filter((car) => car.make === filters.make);
     }
 
     if (filters.priceRange) {
-      const [min, max] = filters.priceRange.split("-").map(Number)
+      const [min, max] = filters.priceRange.split("-").map(Number);
       if (max) {
-        filtered = filtered.filter((car) => car.price >= min && car.price <= max)
+        filtered = filtered.filter(
+          (car) => car.price >= min && car.price <= max
+        );
       } else {
-        filtered = filtered.filter((car) => car.price >= min)
+        filtered = filtered.filter((car) => car.price >= min);
       }
     }
 
     if (filters.year) {
-      filtered = filtered.filter((car) => car.year.toString() === filters.year)
+      filtered = filtered.filter((car) => car.year.toString() === filters.year);
     }
 
-    setFilteredCars(filtered)
-  }
+    setFilteredCars(filtered);
+  };
 
   return (
     <div className="min-h-screen py-20 bg-neutral-black">
@@ -130,11 +133,15 @@ export default function CarsPage() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-neutral-silver text-lg mb-4">No vehicles match your current filters.</p>
-            <p className="text-neutral-silver">Try adjusting your search criteria.</p>
+            <p className="text-neutral-silver text-lg mb-4">
+              No vehicles match your current filters.
+            </p>
+            <p className="text-neutral-silver">
+              Try adjusting your search criteria.
+            </p>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

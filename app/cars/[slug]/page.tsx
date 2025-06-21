@@ -15,10 +15,10 @@ const getCarBySlug = (slug: string): CarDetails | null => {
       year: 2014,
       price: 1850000,
       images: [
-        "/placeholder.svg?height=600&width=800",
-        "/placeholder.svg?height=600&width=800",
-        "/placeholder.svg?height=600&width=800",
-        "/placeholder.svg?height=600&width=800",
+       "/images/bm/bm1.jpg", // Fixed: Remove "public" and use forward slashes
+    "/images/bm/bm2.jpg", // Fixed: Remove "public" and use forward slashes
+    "/images/bm/bm3.jpg", // Add more actual images if you have them
+    "/images/bm/bm4.jpg", // Or use placeholder for now
       ],
       mileage: 146000,
       transmission: "Automatic",

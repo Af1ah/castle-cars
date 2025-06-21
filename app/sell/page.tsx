@@ -24,15 +24,34 @@ export default function SellPage() {
   const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const response = await fetch('/api/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          form: 'Sell Form',
+        }),
+      });
 
-    setSubmitted(true)
-    setIsSubmitting(false)
-  }
+      if (response.ok) {
+        setSubmitted(true);
+      } else {
+        console.error('Failed to send email');
+        alert('Failed to send email. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('An error occurred while sending the email. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({
@@ -268,8 +287,9 @@ export default function SellPage() {
                   onChange={handleChange}
                 />
               </div>
+              
 
-              {/* Photo Upload Placeholder */}
+              {/* Photo Upload Placeholder
               <div>
                 <label className="block text-sm font-medium text-[#8daece] mb-2">Photos (Optional)</label>
                 <div className="border-2 border-dashed border-[#20364b] rounded-xl p-8 text-center">
@@ -277,7 +297,7 @@ export default function SellPage() {
                   <p className="text-[#8daece] mb-2">Upload photos of your vehicle</p>
                   <p className="text-sm text-[#8daece]">Drag and drop or click to browse</p>
                 </div>
-              </div>
+              </div> */}
 
               <Button type="submit" variant="primary" size="lg" className="w-full text-lg" disabled={isSubmitting}>
                 {isSubmitting ? "Submitting..." : "Get My Quote"}

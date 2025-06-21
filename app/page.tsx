@@ -14,7 +14,8 @@ const featuredCars = [
     title: "BMW X5 xDrive40i",
     year: 2023,
     price: 6500000,
-    image: "/placeholder.svg?height=400&width=600",
+    image:         "images\bm\bm1.jpg?height=600&width=800",
+
     mileage: 15000,
     transmission: "Automatic",
     featured: true,

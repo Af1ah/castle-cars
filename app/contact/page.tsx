@@ -1,12 +1,11 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Phone, Mail, MapPin, Clock, Instagram } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, Instagram, Upload, X, FileText } from "lucide-react"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -15,19 +14,56 @@ export default function ContactPage() {
     phone: "",
     message: "",
   })
+  const [files, setFiles] = useState<File[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      // Create FormData to handle file uploads
+      const submitData = new FormData();
+      
+      // Add form fields
+      Object.entries(formData).forEach(([key, value]) => {
+        submitData.append(key, value);
+      });
+      
+      // Add form identifier
+      submitData.append('form', 'Contact Form');
+      
+      // Add files
+      files.forEach((file) => {
+        submitData.append('attachments', file);
+      });
 
-    setSubmitted(true)
-    setIsSubmitting(false)
-    setFormData({ name: "", email: "", phone: "", message: "" })
+      const response = await fetch('/api/email', {
+        method: 'POST',
+        body: submitData, // Don't set Content-Type header, let browser set it for FormData
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitted(true);
+        setFormData({ name: "", email: "", phone: "", message: "" });
+        setFiles([]);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } else {
+        console.error('Failed to send email:', result);
+        alert(result.message || 'Failed to send email. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('An error occurred while sending the email. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,6 +71,40 @@ export default function ContactPage() {
       ...prev,
       [e.target.name]: e.target.value,
     }))
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    
+    // Validate file sizes (10MB limit per file)
+    const validFiles = selectedFiles.filter(file => {
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`File "${file.name}" is too large. Maximum size is 10MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    // Limit total files to 5
+    const totalFiles = [...files, ...validFiles];
+    if (totalFiles.length > 5) {
+      alert('Maximum 5 files allowed');
+      return;
+    }
+
+    setFiles(totalFiles);
+  }
+
+  const removeFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
   return (
@@ -69,7 +139,7 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-[#8daece] mb-2">
-                    Your Name
+                    Your Name *
                   </label>
                   <Input
                     id="name"
@@ -84,7 +154,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-[#8daece] mb-2">
-                    Your Email
+                    Your Email *
                   </label>
                   <Input
                     id="email"
@@ -108,13 +178,12 @@ export default function ContactPage() {
                     placeholder="Enter your phone number"
                     value={formData.phone}
                     onChange={handleChange}
-                    required
                   />
                 </div>
 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-[#8daece] mb-2">
-                    Your Message
+                    Your Message *
                   </label>
                   <Textarea
                     id="message"
@@ -126,8 +195,78 @@ export default function ContactPage() {
                   />
                 </div>
 
+                {/* File Upload Section */}
+                <div>
+                  <label className="block text-sm font-medium text-[#8daece] mb-2">
+                    Attachments (Optional)
+                  </label>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        onChange={handleFileChange}
+                        accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.xls,.xlsx"
+                        className="hidden"
+                        id="file-upload"
+                      />
+                      <label
+                        htmlFor="file-upload"
+                        className="flex items-center gap-2 px-4 py-2 bg-[#20364b] hover:bg-[#2a4b66] rounded-lg cursor-pointer transition-colors"
+                      >
+                        <Upload className="h-4 w-4" />
+                        <span className="text-sm">Choose Files</span>
+                      </label>
+                      <span className="text-xs text-[#8daece]">
+                        Max 5 files, 10MB each
+                      </span>
+                    </div>
+
+                    {/* File List */}
+                    {files.length > 0 && (
+                      <div className="space-y-2">
+                        {files.map((file, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-[#20364b] rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-[#C4A750]" />
+                              <div className="text-sm">
+                                <div className="text-white">{file.name}</div>
+                                <div className="text-[#8daece] text-xs">
+                                  {formatFileSize(file.size)}
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeFile(index)}
+                              className="text-red-400 hover:text-red-300 transition-colors"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="text-xs text-[#8daece]">
+                      Supported formats: PDF, DOC, DOCX, TXT, JPG, PNG, GIF, XLS, XLSX
+                    </div>
+                  </div>
+                </div>
+
                 <Button type="submit" variant="blue" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? "Sending..." : "Send Message"}
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Sending...
+                    </div>
+                  ) : (
+                    "Send Message"
+                  )}
                 </Button>
               </form>
             )}
