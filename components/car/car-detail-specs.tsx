@@ -1,26 +1,11 @@
 import { Check, X, AlertCircle, FileText, Wrench, Shield } from "lucide-react"
+import { Car } from "@/types/car"
 
 interface CarDetailSpecsProps {
-  optionalDetails?: {
-    ownerHistory?: string
-    serviceHistory?: string
-    tyreCondition?: string
-    modifications?: string[]
-    condition?: string
-    documentation?: string[]
-    financing?: string
-    insurance?: string
-    additionalFeatures?: string[]
-    inspectionReport?: string
-    warrantyInfo?: string
-    lastServiceDate?: string
-    nextServiceDue?: string
-  }
+  car: Car
 }
 
-export function CarDetailSpecs({ optionalDetails }: CarDetailSpecsProps) {
-  if (!optionalDetails) return null
-
+export function CarDetailSpecs({ car }: CarDetailSpecsProps) {
   const getStatusIcon = (text: string) => {
     if (text.toLowerCase().includes("not available") || text.toLowerCase().includes("zero faults")) {
       return <X className="h-4 w-4 text-red-400" />
@@ -40,28 +25,23 @@ export function CarDetailSpecs({ optionalDetails }: CarDetailSpecsProps) {
       title: "Ownership & History",
       icon: FileText,
       items: [
-        { label: "Owner History", value: optionalDetails.ownerHistory },
-        { label: "Service History", value: optionalDetails.serviceHistory },
-        { label: "Last Service", value: optionalDetails.lastServiceDate },
-        { label: "Next Service Due", value: optionalDetails.nextServiceDue },
+        { label: "Owner History", value: car.ownership },
+        { label: "Insurance", value: car.insurance },
       ],
     },
     {
       title: "Condition & Maintenance",
       icon: Wrench,
       items: [
-        { label: "Overall Condition", value: optionalDetails.condition },
-        { label: "Tyre Condition", value: optionalDetails.tyreCondition },
-        { label: "Inspection Report", value: optionalDetails.inspectionReport },
+        { label: "Overall Condition", value: car.condition },
+        { label: "Warranty", value: car.warranty },
       ],
     },
     {
       title: "Documentation & Finance",
       icon: Shield,
       items: [
-        { label: "Financing", value: optionalDetails.financing },
-        { label: "Insurance", value: optionalDetails.insurance },
-        { label: "Warranty", value: optionalDetails.warrantyInfo },
+        { label: "Financing", value: car.loan_available ? "Available" : "Not Available" },
       ],
     },
   ]
@@ -102,60 +82,6 @@ export function CarDetailSpecs({ optionalDetails }: CarDetailSpecsProps) {
           </div>
         )
       })}
-
-      {/* Documentation List */}
-      {optionalDetails.documentation && optionalDetails.documentation.length > 0 && (
-        <div className="bg-neutral-matteBlack rounded-xl p-6 border border-neutral-darkGray">
-          <div className="flex items-center gap-3 mb-4">
-            <FileText className="h-5 w-5 text-primary-gold" />
-            <h4 className="text-lg font-semibold text-white">Documentation</h4>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {optionalDetails.documentation.map((doc, index) => (
-              <div key={index} className="flex items-center gap-2 p-3 bg-neutral-darkGray rounded-lg">
-                <Check className="h-4 w-4 text-green-400" />
-                <span className="text-white text-sm">{doc}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Modifications & Upgrades */}
-      {optionalDetails.modifications && optionalDetails.modifications.length > 0 && (
-        <div className="bg-neutral-matteBlack rounded-xl p-6 border border-neutral-darkGray">
-          <div className="flex items-center gap-3 mb-4">
-            <Wrench className="h-5 w-5 text-primary-gold" />
-            <h4 className="text-lg font-semibold text-white">Modifications & Upgrades</h4>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {optionalDetails.modifications.map((mod, index) => (
-              <div key={index} className="flex items-center gap-2 p-3 bg-neutral-darkGray rounded-lg">
-                <AlertCircle className="h-4 w-4 text-primary-gold" />
-                <span className="text-white text-sm">{mod}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Additional Features */}
-      {optionalDetails.additionalFeatures && optionalDetails.additionalFeatures.length > 0 && (
-        <div className="bg-neutral-matteBlack rounded-xl p-6 border border-neutral-darkGray">
-          <div className="flex items-center gap-3 mb-4">
-            <Shield className="h-5 w-5 text-primary-gold" />
-            <h4 className="text-lg font-semibold text-white">Additional Features</h4>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {optionalDetails.additionalFeatures.map((feature, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary-gold rounded-full" />
-                <span className="text-neutral-silver text-sm">{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

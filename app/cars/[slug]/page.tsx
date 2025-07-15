@@ -1,118 +1,49 @@
-import Image from "next/image"
-import Link from "next/link"
-import { CTAButton } from "@/components/ui/cta-button"
-import { CarDetailSpecs } from "@/components/car/car-detail-specs"
-import { ArrowLeft, Phone, MessageCircle, Calendar, Gauge, Fuel, Cog, Share2 } from "lucide-react"
-import { formatPrice } from "@/lib/utils"
-import type { CarDetails } from "@/types/car"
+import Link from "next/link";
+import { Metadata, ResolvingMetadata } from "next";
+import { CTAButton } from "@/components/ui/cta-button";
+import { CarDetailSpecs } from "@/components/car/car-detail-specs";
+import { CarImageGallery } from "@/components/car/car-image-gallery";
+import { ShareButton } from "@/components/car/share-button";
+import { ArrowLeft, Phone, MessageCircle, Calendar, Gauge, Fuel, Cog } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
+import { Car } from "@/types/car";
+import { cars } from "@/constants/cars";
+import { SITE_URL } from "@/constants/seo";
 
-// Mock car data with optional details - in a real app, this would come from a database
-const getCarBySlug = (slug: string): CarDetails | null => {
-  const cars: Record<string, CarDetails> = {
-    "bmw-f30-320d-2014": {
-      id: "bmw-f30-320d-2014",
-      title: "BMW F30 320d Luxury Line",
-      year: 2014,
-      price: 1850000,
-      images: [
-       "/images/bm/bm1.jpg", // Fixed: Remove "public" and use forward slashes
-    "/images/bm/bm2.jpg", // Fixed: Remove "public" and use forward slashes
-    "/images/bm/bm3.jpg", // Add more actual images if you have them
-    "/images/bm/bm4.jpg", // Or use placeholder for now
-      ],
-      mileage: 146000,
-      transmission: "Automatic",
-      make: "BMW",
-      model: "F30 320d",
-      fuelType: "Diesel",
-      engine: "2.0L Turbo Diesel",
-      drivetrain: "RWD",
-      exterior: "Alpine White",
-      interior: "Black Leather",
-      location: "Vengara, Malappuram",
+const getCarBySlug = (slug: string): Car | null => {
+  return cars.find((car) => car.slug === slug) || null;
+};
 
-      // Optional detailed information from Instagram post
-      optionalDetails: {
-        ownerHistory: "3rd owner",
-        serviceHistory: "Major service done at 120k (at showroom)",
-        tyreCondition: "New continental tyres (99%)",
-        modifications: ["10.5 android screen", "M5 Alloy wheels"],
-        condition: "Zero faults",
-        documentation: ["NOC available"],
-        financing: "Finance not available",
-        additionalFeatures: [
-          "Luxury Line Package",
-          "Professional Navigation",
-          "Xenon Headlights",
-          "Parking Sensors",
-          "Cruise Control",
-        ],
-      },
+type Props = {
+  params: { slug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-      features: [
-        "Premium Package",
-        "Navigation System",
-        "Panoramic Sunroof",
-        "Heated Seats",
-        "Apple CarPlay",
-        "Backup Camera",
-        "Blind Spot Monitoring",
-        "Lane Departure Warning",
-      ],
-      description:
-        "This stunning BMW F30 320d combines luxury, performance, and efficiency in one exceptional package. With its powerful turbocharged diesel engine and advanced features, it delivers an engaging driving experience while providing excellent fuel economy.",
-    },
-    "bmw-x5-2023": {
-      id: "bmw-x5-2023",
-      title: "BMW X5 xDrive40i",
-      year: 2023,
-      price: 6500000,
-      images: [
-        "/placeholder.svg?height=600&width=800",
-        "/placeholder.svg?height=600&width=800",
-        "/placeholder.svg?height=600&width=800",
-        "/placeholder.svg?height=600&width=800",
-      ],
-      mileage: 15000,
-      transmission: "Automatic",
-      make: "BMW",
-      model: "X5",
-      fuelType: "Gasoline",
-      engine: "3.0L Turbo I6",
-      drivetrain: "AWD",
-      exterior: "Alpine White",
-      interior: "Black Leather",
-      location: "Vengara, Malappuram",
+export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const car = getCarBySlug(params.slug);
 
-      // This car has minimal optional details
-      optionalDetails: {
-        ownerHistory: "Single owner",
-        condition: "Excellent condition",
-        documentation: ["RC available", "Insurance valid", "Service records"],
-        financing: "Finance available",
-        warrantyInfo: "Extended warranty till 2026",
-      },
-
-      features: [
-        "Premium Package",
-        "Navigation System",
-        "Panoramic Sunroof",
-        "Heated Seats",
-        "Apple CarPlay",
-        "Backup Camera",
-        "Blind Spot Monitoring",
-        "Lane Departure Warning",
-      ],
-      description:
-        "This stunning BMW X5 combines luxury, performance, and versatility in one exceptional package. With its powerful turbocharged engine and advanced all-wheel-drive system, it delivers an engaging driving experience while providing the space and comfort your family needs.",
-    },
+  if (!car) {
+    return {
+      title: "Car Not Found",
+    };
   }
 
-  return cars[slug] || null
+  const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: `${car.title} | Castle Cars`,
+    description: `Check out this ${car.year} ${car.title}. ${car.condition}.`,
+    openGraph: {
+      title: `${car.title} | Castle Cars`,
+      description: `Check out this ${car.year} ${car.title}. ${car.condition}.`,
+      url: `${SITE_URL}/cars/${car.slug}`,
+      images: [`${SITE_URL}${car.images[0]}`, ...previousImages],
+    },
+  };
 }
 
 export default function CarDetailPage({ params }: { params: { slug: string } }) {
-  const car = getCarBySlug(params.slug)
+  const car = getCarBySlug(params.slug);
 
   if (!car) {
     return (
@@ -141,26 +72,12 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image Gallery */}
-          <div className="space-y-4">
-            <div className="relative h-96 rounded-2xl overflow-hidden">
-              <Image src={car.images[0] || "/placeholder.svg"} alt={car.title} fill className="object-cover" priority />
-              {/* Share Button */}
-              <button className="absolute top-4 right-4 bg-neutral-matteBlack/80 backdrop-blur-sm p-3 rounded-full hover:bg-neutral-darkGray transition-colors">
-                <Share2 className="h-5 w-5 text-white" />
-              </button>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {car.images.slice(1).map((image, index) => (
-                <div key={index} className="relative h-20 rounded-lg overflow-hidden">
-                  <Image
-                    src={image || "/placeholder.svg"}
-                    alt={`${car.title} view ${index + 2}`}
-                    fill
-                    className="object-cover hover:scale-110 transition-transform duration-300 cursor-pointer"
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="relative">
+            <CarImageGallery images={car.images} title={car.title} />
+            <ShareButton
+              title={car.title}
+              text={`Check out this ${car.year} ${car.title} on Castle Cars!`}
+            />
           </div>
 
           {/* Car Details */}
@@ -170,7 +87,7 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
                 <span className="bg-primary-gold text-neutral-black px-3 py-1 rounded-full text-sm font-bold">
                   {car.year}
                 </span>
-                <span className="text-neutral-silver">{car.make}</span>
+                <span className="text-neutral-silver">{car.type}</span>
                 {car.location && (
                   <>
                     <span className="text-neutral-mediumGray">•</span>
@@ -179,7 +96,9 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
                 )}
               </div>
               <h1 className="text-3xl font-bold font-poppins mb-4 text-white">{car.title}</h1>
-              <div className="text-3xl font-bold text-primary-gold mb-6">{formatPrice(car.price)}</div>
+              <div className="text-3xl font-bold text-primary-gold mb-6">
+                {car.asking_price_inr ? formatPrice(car.asking_price_inr) : "Price on request"}
+              </div>
             </div>
 
             {/* Key Specs */}
@@ -189,7 +108,7 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
                   <Gauge className="h-5 w-5 text-primary-gold" />
                   <span className="text-neutral-silver text-sm">Mileage</span>
                 </div>
-                <span className="font-bold text-white">{car.mileage.toLocaleString()} km</span>
+                <span className="font-bold text-white">{car.mileage_km} km</span>
               </div>
 
               <div className="bg-neutral-matteBlack rounded-xl p-4 border border-neutral-darkGray">
@@ -205,7 +124,7 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
                   <Fuel className="h-5 w-5 text-primary-gold" />
                   <span className="text-neutral-silver text-sm">Fuel Type</span>
                 </div>
-                <span className="font-bold text-white">{car.fuelType}</span>
+                <span className="font-bold text-white">{car.fuel}</span>
               </div>
 
               <div className="bg-neutral-matteBlack rounded-xl p-4 border border-neutral-darkGray">
@@ -237,7 +156,7 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-neutral-silver">Exterior Color:</span>
-                  <span className="ml-2 font-medium text-white">{car.exterior}</span>
+                  <span className="ml-2 font-medium text-white">{car.color}</span>
                 </div>
                 <div>
                   <span className="text-neutral-silver">Interior:</span>
@@ -245,11 +164,11 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
                 </div>
                 <div>
                   <span className="text-neutral-silver">Drivetrain:</span>
-                  <span className="ml-2 font-medium text-white">{car.drivetrain}</span>
+                  <span className="ml-2 font-medium text-white">{car.drive}</span>
                 </div>
                 <div>
-                  <span className="text-neutral-silver">Model:</span>
-                  <span className="ml-2 font-medium text-white">{car.model}</span>
+                  <span className="text-neutral-silver">Ownership:</span>
+                  <span className="ml-2 font-medium text-white">{car.ownership}</span>
                 </div>
               </div>
             </div>
@@ -260,12 +179,12 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-white">Description</h2>
-              <p className="text-neutral-silver leading-relaxed">{car.description}</p>
+              <h2 className="text-2xl font-bold mb-4 text-white">Condition</h2>
+              <p className="text-neutral-silver leading-relaxed">{car.condition}</p>
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-white">Standard Features</h2>
+              <h2 className="text-2xl font-bold mb-4 text-white">Features</h2>
               <div className="grid grid-cols-1 gap-2">
                 {car.features.map((feature, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -275,11 +194,22 @@ export default function CarDetailPage({ params }: { params: { slug: string } }) 
                 ))}
               </div>
             </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-4 text-white">Modifications</h2>
+              <div className="grid grid-cols-1 gap-2">
+                {car.modifications.map((modification, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary-gold rounded-full"></div>
+                    <span className="text-neutral-silver">{modification}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Optional Detailed Information */}
           <div>
-            <CarDetailSpecs optionalDetails={car.optionalDetails} />
+            <CarDetailSpecs car={car} />
           </div>
         </div>
 

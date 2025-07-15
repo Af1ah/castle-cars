@@ -1,100 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { CarCard } from "@/components/ui/car-card";
+import { CarCard } from "@/components/car/car-card";
 import { CarFilters } from "@/components/car/car-filters";
 import { SectionTitle } from "@/components/ui/section-title";
-
-// Mock data for cars with some having optional details
-const allCars = [
-  {
-    id: "bmw-f30-320d-2014",
-    title: "BMW F30 320d Luxury Line",
-    year: 2014,
-    price: 1850000,
-    image: "images/bm/bm1.jpg",
-
-    mileage: 146000,
-    transmission: "Automatic",
-    make: "BMW",
-    featured: true,
-  },
-  {
-    id: "bmw-x5-2023",
-    title: "BMW X5 xDrive40i",
-    year: 2023,
-    price: 6500000,
-    image: "/placeholder.svg?height=300&width=400",
-    mileage: 15000,
-    transmission: "Automatic",
-    make: "BMW",
-  },
-  {
-    id: "mercedes-c300-2022",
-    title: "Mercedes-Benz C300",
-    year: 2022,
-    price: 4500000,
-    image: "/placeholder.svg?height=300&width=400",
-    mileage: 22000,
-    transmission: "Automatic",
-    make: "Mercedes",
-  },
-  {
-    id: "audi-a4-2023",
-    title: "Audi A4 Premium Plus",
-    year: 2023,
-    price: 4200000,
-    image: "/placeholder.svg?height=300&width=400",
-    mileage: 18000,
-    transmission: "Automatic",
-    make: "Audi",
-  },
-  {
-    id: "lexus-rx350-2022",
-    title: "Lexus RX 350",
-    year: 2022,
-    price: 4800000,
-    image: "/placeholder.svg?height=300&width=400",
-    mileage: 25000,
-    transmission: "Automatic",
-    make: "Lexus",
-  },
-  {
-    id: "toyota-camry-2023",
-    title: "Toyota Camry XLE",
-    year: 2023,
-    price: 3200000,
-    image: "/placeholder.svg?height=300&width=400",
-    mileage: 12000,
-    transmission: "Automatic",
-    make: "Toyota",
-  },
-];
-
-interface FilterState {
-  make: string;
-  priceRange: string;
-  year: string;
-}
+import { cars } from "@/constants/cars";
+import { Car } from "@/types/car";
 
 export default function CarsPage() {
-  const [filteredCars, setFilteredCars] = useState(allCars);
+  const [filteredCars, setFilteredCars] = useState<Car[]>(cars);
 
-  const handleFilterChange = (filters: FilterState) => {
-    let filtered = allCars;
+  const handleFilterChange = (filters: { make: string; priceRange: string; year: string; }) => {
+    let filtered = cars;
 
     if (filters.make) {
-      filtered = filtered.filter((car) => car.make === filters.make);
+      filtered = filtered.filter((car) => car.type === filters.make);
     }
 
     if (filters.priceRange) {
       const [min, max] = filters.priceRange.split("-").map(Number);
       if (max) {
         filtered = filtered.filter(
-          (car) => car.price >= min && car.price <= max
+          (car) => (car.asking_price_inr ?? 0) >= min && (car.asking_price_inr ?? 0) <= max
         );
       } else {
-        filtered = filtered.filter((car) => car.price >= min);
+        filtered = filtered.filter((car) => (car.asking_price_inr ?? 0) >= min);
       }
     }
 
@@ -121,14 +51,14 @@ export default function CarsPage() {
 
         <div className="mb-6">
           <p className="text-neutral-silver">
-            Showing {filteredCars.length} of {allCars.length} vehicles
+            Showing {filteredCars.length} of {cars.length} vehicles
           </p>
         </div>
 
         {filteredCars.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredCars.map((car, index) => (
-              <CarCard key={car.id} {...car} index={index} />
+              <CarCard key={car.slug} car={car} index={index} />
             ))}
           </div>
         ) : (

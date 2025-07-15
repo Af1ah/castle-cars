@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { CTAButton } from "@/components/ui/cta-button"
+import { cars } from "@/constants/cars"
 
 interface CarFiltersProps {
   onFilterChange: (filters: FilterState) => void
@@ -32,6 +33,8 @@ export function CarFilters({ onFilterChange }: CarFiltersProps) {
     onFilterChange(clearedFilters)
   }
 
+  const makes = [...new Set(cars.map((car) => car.type))]
+
   return (
     <div className="bg-neutral-matteBlack rounded-xl p-6 border border-neutral-darkGray">
       <div className="flex items-center justify-between mb-6">
@@ -50,11 +53,11 @@ export function CarFilters({ onFilterChange }: CarFiltersProps) {
             onChange={(e) => handleFilterChange("make", e.target.value)}
           >
             <option value="">All Makes</option>
-            <option value="BMW">BMW</option>
-            <option value="Mercedes">Mercedes</option>
-            <option value="Audi">Audi</option>
-            <option value="Lexus">Lexus</option>
-            <option value="Toyota">Toyota</option>
+            {makes.map((make) => (
+              <option key={make} value={make}>
+                {make}
+              </option>
+            ))}
           </select>
         </div>
 
