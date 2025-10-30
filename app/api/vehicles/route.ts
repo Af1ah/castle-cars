@@ -25,11 +25,9 @@ export async function POST(req: NextRequest) {
     const make = data.get('make') as string;
     const model = data.get('model') as string;
     const year = data.get('year') as string;
+import { v4 as uuidv4 } from 'uuid';
     const price = data.get('price') as string;
 
-import { v4 as uuidv4 } from 'uuid';
-
-// ... (other code)
     if (!file || !make || !model || !year || !price) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
