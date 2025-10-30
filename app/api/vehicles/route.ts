@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
 import { put } from '@vercel/blob';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function GET() {
   try {
@@ -25,7 +26,6 @@ export async function POST(req: NextRequest) {
     const make = data.get('make') as string;
     const model = data.get('model') as string;
     const year = data.get('year') as string;
-import { v4 as uuidv4 } from 'uuid';
     const price = data.get('price') as string;
 
     if (!file || !make || !model || !year || !price) {
