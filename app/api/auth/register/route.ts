@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const usersFilePath = path.join(process.cwd(), 'database', 'users.json');
+import { kv } from '@vercel/kv';
+import bcrypt from 'bcrypt';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,19 +10,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
     }
 
-    const usersData = fs.readFileSync(usersFilePath, 'utf-8');
-    const users = JSON.parse(usersData);
-
-    const userExists = users.find((user: any) => user.email === email);
+    const userExists = await kv.get(`user:${email}`);
 
     if (userExists) {
       return NextResponse.json({ message: 'User already exists' }, { status: 400 });
     }
 
-    users.push({ email, password });
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log('User created successfully');
+    await kv.set(`user:${email}`, { email, password: hashedPassword });
+
     return NextResponse.json({ message: 'User created successfully' }, { status: 201 });
   } catch (error) {
     console.error(error);

@@ -28,3 +28,34 @@ Continue building your app on:
 2. Deploy your chats from the v0 interface
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
+
+## Vercel KV Setup
+
+This project uses Vercel KV for data storage. To get started, you'll need to create a KV store and link it to your project.
+
+1.  **Create a KV Store:**
+    - Go to your Vercel dashboard and navigate to the "Storage" tab.
+    - Click "Create" and select "KV (Redis)".
+    - Give your store a name and select a region.
+    - Connect the store to your project.
+
+2.  **Set Environment Variables:**
+    - After creating the store, Vercel will provide you with the following environment variables:
+      - `KV_URL`
+      - `KV_REST_API_URL`
+      - `KV_REST_API_TOKEN`
+      - `KV_REST_API_READ_ONLY_TOKEN`
+    - Add these environment variables to your project's settings on Vercel.
+
+## Vercel Blob Setup
+
+This project uses Vercel Blob for image storage. To get started, you'll need to create a Blob store and link it to your project.
+
+1.  **Create a Blob Store:**
+    - Go to your Vercel dashboard and navigate to the "Storage" tab.
+    - Click "Create" and select "Blob".
+    - Give your store a name and connect it to your project.
+
+2.  **Set Environment Variable:**
+    - After creating the store, Vercel will provide you with the `BLOB_READ_WRITE_TOKEN` environment variable.
+    - Add this environment variable to your project's settings on Vercel.
