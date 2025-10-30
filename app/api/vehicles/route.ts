@@ -1,22 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { writeFile } from 'fs/promises';
-
-const vehiclesFilePath = path.join(process.cwd(), 'database', 'vehicles.json');
+import { kv } from '@vercel/kv';
+import { put } from '@vercel/blob';
 
 export async function GET() {
   try {
-    const vehiclesData = fs.readFileSync(vehiclesFilePath, 'utf-8');
-    const vehicles = JSON.parse(vehiclesData);
+    const vehicleIds = await kv.lrange('vehicles', 0, -1);
+    const vehicles = await Promise.all(vehicleIds.map(id => kv.get(`vehicle:${id}`)));
     return NextResponse.json(vehicles, { status: 200 });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ message: 'Something went wrong' }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const userCookie = req.cookies.get('user');
+    if (!userCookie) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     const data = await req.formData();
     const file: File | null = data.get('image') as unknown as File;
     const make = data.get('make') as string;
@@ -24,35 +27,27 @@ export async function POST(req: NextRequest) {
     const year = data.get('year') as string;
     const price = data.get('price') as string;
 
+import { v4 as uuidv4 } from 'uuid';
+
+// ... (other code)
     if (!file || !make || !model || !year || !price) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const { url } = await put(file.name, file, { access: 'public' });
 
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-
-    const filePath = path.join(uploadsDir, file.name);
-    await writeFile(filePath, buffer);
-
-    const vehiclesData = fs.readFileSync(vehiclesFilePath, 'utf-8');
-    const vehicles = JSON.parse(vehiclesData);
-
+    const id = uuidv4();
     const newVehicle = {
-      id: Date.now(),
+      id,
       make,
       model,
       year,
       price,
-      imageUrl: `/uploads/${file.name}`,
+      imageUrl: url,
     };
 
-    vehicles.push(newVehicle);
-    fs.writeFileSync(vehiclesFilePath, JSON.stringify(vehicles, null, 2));
+    await kv.set(`vehicle:${id}`, newVehicle);
+    await kv.lpush('vehicles', id);
 
     return NextResponse.json({ message: 'Vehicle uploaded successfully', vehicle: newVehicle }, { status: 201 });
   } catch (error) {

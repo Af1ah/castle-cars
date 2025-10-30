@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { kv } from '@vercel/kv';
+import bcrypt from 'bcrypt';
 
-const usersFilePath = path.join(process.cwd(), 'database', 'users.json');
+interface User {
+  email: string;
+  password?: string;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,12 +15,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
     }
 
-    const usersData = fs.readFileSync(usersFilePath, 'utf-8');
-    const users = JSON.parse(usersData);
+    const user: User | null = await kv.get(`user:${email}`);
 
-    const user = users.find((user: any) => user.email === email && user.password === password);
+    if (!user || !user.password) {
+      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+    }
 
-    if (!user) {
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
@@ -31,6 +37,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ message: 'Something went wrong' }, { status: 500 });
   }
 }
