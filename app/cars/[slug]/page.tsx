@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 import { CTAButton } from "@/components/ui/cta-button";
 import { CarDetailSpecs } from "@/components/car/car-detail-specs";
 import { CarImageGallery } from "@/components/car/car-image-gallery";
@@ -19,7 +19,7 @@ type Props = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const car = getCarBySlug(params.slug);
 
   if (!car) {
@@ -28,16 +28,36 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
     };
   }
 
-  const previousImages = (await parent).openGraph?.images || [];
+  const price = car.asking_price_inr
+    ? `₹${(car.asking_price_inr / 100000).toFixed(1)} Lakh`
+    : "Price on request";
+  const description = `${car.year} ${car.title} • ${price} • ${car.mileage_km} km • ${car.fuel} • ${car.transmission} • ${car.condition}`;
+  const imageUrl = `${SITE_URL}${car.images[0]}`;
+  const pageUrl = `${SITE_URL}/cars/${car.slug}`;
 
   return {
-    title: `${car.title} | Castle Cars`,
-    description: `Check out this ${car.year} ${car.title}. ${car.condition}.`,
+    title: `${car.title} - ${price} | Castle Cars`,
+    description,
     openGraph: {
-      title: `${car.title} | Castle Cars`,
-      description: `Check out this ${car.year} ${car.title}. ${car.condition}.`,
-      url: `${SITE_URL}/cars/${car.slug}`,
-      images: [`${SITE_URL}${car.images[0]}`, ...previousImages],
+      title: `${car.title} - ${price}`,
+      description,
+      url: pageUrl,
+      siteName: "Castle Cars",
+      type: "website",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${car.year} ${car.title}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${car.title} - ${price} | Castle Cars`,
+      description,
+      images: [imageUrl],
     },
   };
 }

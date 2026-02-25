@@ -26,15 +26,15 @@ export default function ContactPage() {
     try {
       // Create FormData to handle file uploads
       const submitData = new FormData();
-      
+
       // Add form fields
       Object.entries(formData).forEach(([key, value]) => {
         submitData.append(key, value);
       });
-      
+
       // Add form identifier
       submitData.append('form', 'Contact Form');
-      
+
       // Add files
       files.forEach((file) => {
         submitData.append('attachments', file);
@@ -75,7 +75,7 @@ export default function ContactPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-    
+
     // Validate file sizes (10MB limit per file)
     const validFiles = selectedFiles.filter(file => {
       if (file.size > 10 * 1024 * 1024) {
@@ -325,7 +325,7 @@ export default function ContactPage() {
                     >
                       @castle_cars_
                     </a>
-                    <p className="text-sm text-[#8daece]">111K+ followers</p>
+                    <p className="text-sm text-[#8daece]">179K+ followers</p>
                   </div>
                 </div>
 

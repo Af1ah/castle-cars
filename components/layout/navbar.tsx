@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { CTAButton } from "@/components/ui/cta-button"
-import { Menu, X, Car, Phone } from "lucide-react"
+import { Menu, X, Phone } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function Navbar() {
@@ -21,7 +21,6 @@ export function Navbar() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/cars", label: "Inventory" },
-    { href: "/car-care", label: "Car Care" },
     { href: "/sell", label: "Sell Car" },
     { href: "/contact", label: "Contact" },
   ]
@@ -29,10 +28,10 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md",
         isScrolled
-          ? "bg-neutral-black/95 backdrop-blur-md border-b border-neutral-darkGray shadow-lg"
-          : "bg-transparent",
+          ? "bg-neutral-black/95 border-b border-neutral-darkGray shadow-lg"
+          : "bg-neutral-black/60",
       )}
     >
       <div className="container mx-auto px-4">
@@ -40,13 +39,15 @@ export function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-3 text-white hover:text-primary-gold transition-colors duration-300 group"
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-300"
           >
-            <div className="relative">
-              <Car className="h-8 w-8 transition-transform duration-300 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-primary-gold/20 rounded-full scale-0 group-hover:scale-150 transition-transform duration-300" />
-            </div>
-            <span className="text-2xl font-bold font-poppins">Castle Cars</span>
+            <img
+              src="/images/logo.png"
+              alt="Castle Cars"
+              className="h-12 w-auto"
+              style={{ filter: "invert(1) brightness(2)" }}
+            />
+            <span className="text-xl font-bold font-poppins text-white">Castle Cars</span>
           </Link>
 
           {/* Desktop Navigation */}

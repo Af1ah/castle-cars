@@ -13,11 +13,11 @@ export function Footer() {
               <span className="text-xl font-bold text-white">Castle Cars</span>
             </div>
             <p className="text-[#8daece] text-sm">
-              Premium used car dealership with 111K+ Instagram followers. Your trusted partner for quality vehicles.
+              Premium used car dealership with 179K+ Instagram followers. Your trusted partner for quality vehicles.
             </p>
             <div className="flex items-center gap-2">
               <Instagram className="h-5 w-5 text-[#C4A750]" />
-              <span className="text-[#8daece] text-sm">111K+ Followers</span>
+              <span className="text-[#8daece] text-sm">179K+ Followers</span>
             </div>
           </div>
 
@@ -31,9 +31,7 @@ export function Footer() {
               <Link href="/sell" className="block text-[#8daece] hover:text-[#C4A750] transition-colors text-sm">
                 Sell Your Car
               </Link>
-              <Link href="/car-care" className="block text-[#8daece] hover:text-[#C4A750] transition-colors text-sm">
-                Car Care Products
-              </Link>
+
               <Link href="/contact" className="block text-[#8daece] hover:text-[#C4A750] transition-colors text-sm">
                 Contact Us
               </Link>

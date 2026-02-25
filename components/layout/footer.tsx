@@ -6,7 +6,6 @@ export function Footer() {
   const quickLinks = [
     { href: "/cars", label: "View Inventory" },
     { href: "/sell", label: "Sell Your Car" },
-    { href: "/car-care", label: "Car Care Products" },
     { href: "/contact", label: "Contact Us" },
   ]
 
@@ -23,12 +22,12 @@ export function Footer() {
               <span className="text-2xl font-bold font-poppins text-white">Castle Cars</span>
             </div>
             <p className="text-neutral-silver leading-relaxed">
-              Kerala's most trusted premium used car dealership with 111K+ Instagram followers. Your partner for quality
+              Kerala's most trusted premium used car dealership with 179K+ Instagram followers. Your partner for quality
               vehicles in Malappuram.
             </p>
             <div className="flex items-center gap-2">
               <Instagram className="h-5 w-5 text-primary-gold" />
-              <span className="text-neutral-silver text-sm">111K+ Followers</span>
+              <span className="text-neutral-silver text-sm">179K+ Followers</span>
             </div>
           </div>
 

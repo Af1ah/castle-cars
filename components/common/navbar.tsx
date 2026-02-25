@@ -26,9 +26,7 @@ export function Navbar() {
             <Link href="/cars" className="text-white hover:text-[#C4A750] transition-colors font-medium">
               Inventory
             </Link>
-            <Link href="/car-care" className="text-white hover:text-[#C4A750] transition-colors font-medium">
-              Car Care
-            </Link>
+
             <Link href="/sell" className="text-white hover:text-[#C4A750] transition-colors font-medium">
               Sell Your Car
             </Link>
@@ -60,9 +58,7 @@ export function Navbar() {
               <Link href="/cars" className="text-white hover:text-[#C4A750] transition-colors font-medium">
                 Inventory
               </Link>
-              <Link href="/car-care" className="text-white hover:text-[#C4A750] transition-colors font-medium">
-                Car Care
-              </Link>
+
               <Link href="/sell" className="text-white hover:text-[#C4A750] transition-colors font-medium">
                 Sell Your Car
               </Link>
