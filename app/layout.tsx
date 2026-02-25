@@ -26,6 +26,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Castle Cars" }],
   creator: "Castle Cars",
   publisher: "Castle Cars",
+  applicationName: "Castle Cars",
   formatDetection: {
     email: false,
     address: false,
@@ -70,7 +71,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  generator: 'v0.dev'
+  generator: 'Castle Cars'
 }
 
 export default function RootLayout({
@@ -81,6 +82,23 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth dark">
       <body className={`${inter.variable} ${poppins.variable} font-sans bg-neutral-black text-white antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Castle Cars",
+              url: "https://castlecars.com",
+              description: "Premium used car dealership in Vengara, Malappuram, Kerala",
+              publisher: {
+                "@type": "Organization",
+                name: "Castle Cars",
+                url: "https://castlecars.com",
+              },
+            }),
+          }}
+        />
         <Navbar />
         <main>{children}</main>
         <Footer />
